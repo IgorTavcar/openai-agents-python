@@ -1229,7 +1229,12 @@ async def run_single_turn_streamed(
                 response_id=terminal_response.id,
                 request_id=getattr(terminal_response, "_request_id", None),
             )
-            context_wrapper.usage.add(usage)
+            context_wrapper.usage.add(
+                usage,
+                model_name=model.model,
+                agent_name=agent.name,
+                response_id=terminal_response.id,
+            )
 
         if isinstance(event, ResponseOutputItemDoneEvent):
             output_item = event.item
@@ -1568,7 +1573,12 @@ async def get_new_response(
             logger.error("Error getting response; filtered.input=%s", filtered.input)
             raise
 
-    context_wrapper.usage.add(new_response.usage)
+    context_wrapper.usage.add(
+        new_response.usage,
+        model_name=model.model,
+        agent_name=agent.name,
+        response_id=new_response.response_id,
+    )
 
     await asyncio.gather(
         (
